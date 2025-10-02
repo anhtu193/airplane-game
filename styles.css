@@ -116,8 +116,8 @@ body {
     image-rendering: pixelated;
     max-width: 80%;
     object-fit: contain;
-    margin-bottom: -10px;
-    margin-top: -20px;
+    margin-bottom: -30px;
+    margin-top: 10px;
 }
 
 .start-button {

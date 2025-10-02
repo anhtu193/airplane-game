@@ -52,12 +52,12 @@ startButton.addEventListener('click', () => {
 gameVideo.addEventListener('ended', () => {
     // Hide game video with slide effect
     gameVideo.style.transform = 'translateX(-100%)';
-    gameVideo.style.transition = 'transform 0.5s ease-in-out';
+    gameVideo.style.transition = 'transform 0.3s ease-in-out';
     
     // Also hide the game screen container
     const gameScreen = document.querySelector('.game-screen');
     gameScreen.style.opacity = '0';
-    gameScreen.style.transition = 'opacity 0.5s ease-in-out';
+    gameScreen.style.transition = 'opacity 0.3s ease-in-out';
     
     setTimeout(() => {
         gameVideo.classList.remove('active');
@@ -67,13 +67,14 @@ gameVideo.addEventListener('ended', () => {
         
         // Show survey notification
         showSurveyNotification();
-    }, 500);
+    }, 300);
 });
 
 // Show survey notification
 function showSurveyNotification() {
     const notification = document.createElement('div');
     notification.className = 'survey-notification';
+    notification.style.opacity = '0';
     notification.innerHTML = `
         <div class="notification-content">
             <p>Trước khi bắt đầu chơi, xin phép bạn trả lời 1 số câu hỏi sau đây nhé</p>
@@ -82,6 +83,12 @@ function showSurveyNotification() {
     `;
     
     document.body.appendChild(notification);
+    
+    // Fade in first
+    setTimeout(() => {
+        notification.style.transition = 'opacity 0.3s ease-in-out';
+        notification.style.opacity = '1';
+    }, 50);
     
     // Slide in from right
     setTimeout(() => {
@@ -101,7 +108,7 @@ function startSurvey() {
     const blackBackground = document.createElement('div');
     blackBackground.className = 'survey-black-background';
     blackBackground.style.opacity = '0';
-    blackBackground.style.transition = 'opacity 0.5s ease-in-out';
+    blackBackground.style.transition = 'opacity 0.3s ease-in-out';
     document.body.appendChild(blackBackground);
     
     // Fade in black background
@@ -171,7 +178,7 @@ function showGameIntroduction() {
     // Fade out persistent black background
     const blackBackground = document.querySelector('.survey-black-background');
     if (blackBackground) {
-        blackBackground.style.transition = 'opacity 0.5s ease-in-out';
+        blackBackground.style.transition = 'opacity 0.3s ease-in-out';
         blackBackground.style.opacity = '0';
         
         // Remove after fade out completes
@@ -198,9 +205,20 @@ function showGameIntroduction() {
         introOverlay.className = 'game-intro-overlay';
         introOverlay.innerHTML = `
             <div class="intro-content">
-                <h2>Hướng dẫn trò chơi</h2>
-                <p>Trò chơi cực kỳ đơn giản. Chỉ cần bạn chạm để bắt được máy bay Vietjet và nhận quà ngay nhé!</p>
-                <button class="start-game-btn" onclick="startGame()">Bắt đầu chơi</button>
+                <h2>🎮 Hướng dẫn trò chơi</h2>
+                <div style="text-align: left; margin: 15px 0;">
+                    <p style="margin-bottom: 12px; font-size: 14px;">📋 <strong>Nhiệm vụ:</strong></p>
+                    <p style="margin-bottom: 8px; padding-left: 15px; font-size: 13px;">• Bắt <span style="color: #ffd700; font-weight: bold;">6/10 máy bay</span> để thắng</p>
+                    <p style="margin-bottom: 12px; padding-left: 15px; font-size: 13px;">• Có <span style="color: #ff6b6b; font-weight: bold;">3 mạng</span> để thực hiện</p>
+                    
+                    <p style="margin-bottom: 12px; font-size: 14px;">🎯 <strong>Cách chơi:</strong></p>
+                    <p style="margin-bottom: 8px; padding-left: 15px; font-size: 13px;">• Chạm vào máy bay để bắt</p>
+                    <p style="margin-bottom: 12px; padding-left: 15px; font-size: 13px;">• Chạm trượt mất 1 mạng</p>
+                    
+                    <p style="margin-bottom: 12px; font-size: 14px;">🏆 <strong>Phần thưởng:</strong></p>
+                    <p style="margin-bottom: 8px; padding-left: 15px; font-size: 13px;">• Nhận một phần quà bí mật từ Vietjet!</p>
+                </div>
+                <button class="start-game-btn" onclick="startGame()">🚀  Bắt đầu chơi</button>
             </div>
         `;
         
@@ -399,6 +417,11 @@ function createPlane() {
         cursor: pointer;
         z-index: 6;
         transition: opacity 0.3s ease;
+        user-select: none;
+        -webkit-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+        pointer-events: auto;
         ${isFlipped ? 'transform: scaleX(-1);' : ''}
     `;
     
@@ -415,12 +438,26 @@ function createPlane() {
         plane.style.left = 'auto';
     }
     
+    // Prevent drag and selection
+    plane.addEventListener('dragstart', (e) => {
+        e.preventDefault();
+    });
+    
+    plane.addEventListener('selectstart', (e) => {
+        e.preventDefault();
+    });
+    
+    plane.addEventListener('mousedown', (e) => {
+        e.preventDefault();
+    });
+    
     // Add click handler
     plane.addEventListener('click', () => catchPlane(plane));
     
-    // Add miss handler for clicking outside the plane
-    plane.addEventListener('click', (e) => {
-        e.stopPropagation();
+    // Add touchend handler for mobile
+    plane.addEventListener('touchend', (e) => {
+        e.preventDefault();
+        catchPlane(plane);
     });
     
     // Add to game area
@@ -586,9 +623,11 @@ function showWinScreen() {
         </p>
         <div style="margin: 20px 0;">
             <img src="assets/images/vietjet-voucher.png" alt="Vietjet Voucher QR Code" style="
-                width: 150px;
-                height: 150px;
+                width: 200px;
+                height: 200px;
                 image-rendering: pixelated;
+                scale: 1.1;
+                margin-top: 20px;
                 border: 2px solid #ffffff;
                 border-radius: 8px;
             ">
@@ -830,17 +869,17 @@ function submitRating() {
     finalContent.style.cssText = `
         text-align: center;
         color: #ffffff;
-        max-width: 400px;
+        max-width: 500px;
         padding: 20px;
         max-height: 90vh;
         overflow-y: auto;
     `;
     
     finalContent.innerHTML = `
-        <h2 style="font-family: 'Fernando', sans-serif; font-size: 18px; margin-bottom: 20px; color: #00bfff; line-height: 1.3;">
-            Xin cám ơn bạn đã sử dụng dịch vụ của Vietjet ngày hôm nay.
+        <h2 style="font-family: 'Fernando', sans-serif; font-size: 20px; margin-bottom: 20px; color: #00bfff; line-height: 1.3;">
+            Xin cảm ơn bạn đã sử dụng dịch vụ của Vietjet ngày hôm nay.
         </h2>
-        <p style="font-family: 'Fernando', sans-serif; font-size: 16px; margin-bottom: 25px; line-height: 1.4;">
+        <p style="font-family: 'Fernando', sans-serif; font-size: 18px; margin-bottom: 25px; line-height: 1.4;">
             Chúc bạn có 1 chuyến đi vui vẻ và an toàn nhé.
         </p>
         <div style="margin-top: 25px;">
@@ -856,6 +895,22 @@ function submitRating() {
     setTimeout(() => {
         returnToLoadingScreen();
     }, 5000);
+}
+
+// Helper function to get current DOM elements
+function getCurrentElements() {
+    return {
+        startButton: document.getElementById('startButton'),
+        startOverlay: document.getElementById('startOverlay'),
+        loadingVideo: document.getElementById('loadingVideo'),
+        gameVideo: document.getElementById('gameVideo')
+    };
+}
+
+// Update global element references to latest objects
+function updateGlobalElements() {
+    // Since const variables can't be reassigned, we need to use helper functions
+    // when accessing elements after DOM reset
 }
 
 // Return to loading screen
@@ -890,25 +945,76 @@ function returnToLoadingScreen() {
     const newStartOverlay = gameScreen.querySelector('#startOverlay');
     const newStartButton = gameScreen.querySelector('#startButton');
     
-    // Update global references
-    loadingVideo = newLoadingVideo;
-    gameVideo = newGameVideo;
-    startOverlay = newStartOverlay;
-    startButton = newStartButton;
+    // References updated - using new element variables
+    
+    // Reset overlay state
+    newStartOverlay.classList.remove('hidden');
+    
+    // Reload videos to ensure clean state
+    newLoadingVideo.load();
+    newGameVideo.load();
     
     // Start the loading video
-    loadingVideo.play();
+    newLoadingVideo.play();
     
     // Re-attach event listeners
-    startButton.addEventListener('click', () => {
-        // Hide loading video and show game video
-        loadingVideo.classList.remove('active');
-        gameVideo.classList.add('active');
-        gameVideo.play();
+    newStartButton.addEventListener('click', () => {
+        console.log('Start button clicked after reset');
         
-        // Hide start overlay
-        startOverlay.classList.add('hidden');
+        // Hide the start button overlay
+        newStartOverlay.classList.add('hidden');
+        
+        // Reset and hide loading video
+        newLoadingVideo.pause();
+        newLoadingVideo.currentTime = 0;
+        newLoadingVideo.classList.remove('active');
+        
+        // Reset and show game video
+        newGameVideo.currentTime = 0;
+        newGameVideo.classList.add('active');
+        
+        // Play game video with error handling
+        newGameVideo.play().catch(err => {
+            console.error('Game video play failed:', err);
+            // If autoplay fails, try again after a short delay
+            setTimeout(() => {
+                newGameVideo.play().catch(e => console.error('Retry failed:', e));
+            }, 100);
+        });
     });
+    
+    // Re-attach game video event listener
+    newGameVideo.addEventListener('ended', () => {
+        console.log('Game video ended after reset');
+        
+        // Hide game video with slide effect
+        newGameVideo.style.transform = 'translateX(-100%)';
+        newGameVideo.style.transition = 'transform 0.3s ease-in-out';
+        
+        // Also hide the game screen container
+        const gameScreen = document.querySelector('.game-screen');
+        gameScreen.style.opacity = '0';
+        gameScreen.style.transition = 'opacity 0.3s ease-in-out';
+        
+        setTimeout(() => {
+            newGameVideo.classList.remove('active');
+            newGameVideo.style.transform = '';
+            newGameVideo.style.transition = '';
+            gameScreen.style.display = 'none';
+            
+            // Show survey notification
+            console.log('Starting survey flow...');
+            showSurveyNotification();
+        }, 300);
+    });
+    
+    // Add error listener for game video
+    newGameVideo.addEventListener('error', (e) => {
+        console.error('Game video error after reset:', e);
+    });
+    
+    // Add error handlers for the new elements
+    addVideoErrorHandlers();
     
     // Reset game state
     gameState = {
@@ -998,26 +1104,55 @@ function restartGame() {
     gameScreen.innerHTML = '';
     
     // Show loading video and start button again
-    loadingVideo.classList.add('active');
-    loadingVideo.play();
-    startOverlay.classList.remove('hidden');
+    const currentLoadingVideo = document.getElementById('loadingVideo');
+    const currentStartOverlay = document.getElementById('startOverlay');
+    
+    if (currentLoadingVideo) {
+        currentLoadingVideo.classList.add('active');
+        currentLoadingVideo.play();
+    }
+    
+    if (currentStartOverlay) {
+        currentStartOverlay.classList.remove('hidden');
+    }
 }
 
-// Handle video errors
-loadingVideo.addEventListener('error', (e) => {
-    console.error('Loading video error:', e);
-});
+// Handle video errors with current elements
+function addVideoErrorHandlers() {
+    const currentLoadingVideo = document.getElementById('loadingVideo');
+    const currentGameVideo = document.getElementById('gameVideo');
+    
+    if (currentLoadingVideo) {
+        currentLoadingVideo.addEventListener('error', (e) => {
+            console.error('Loading video error:', e);
+        });
+    }
+    
+    if (currentGameVideo) {
+        currentGameVideo.addEventListener('error', (e) => {
+            console.error('Game video error:', e);
+        });
+    }
+}
 
-gameVideo.addEventListener('error', (e) => {
-    console.error('Game video error:', e);
-});
+// Add error handlers for initial elements
+addVideoErrorHandlers();
 
 // Add click handler to unmute videos if needed
 let soundEnabled = false;
 document.addEventListener('click', () => {
     if (!soundEnabled) {
-        loadingVideo.muted = false;
-        gameVideo.muted = false;
+        const currentLoadingVideo = document.getElementById('loadingVideo');
+        const currentGameVideo = document.getElementById('gameVideo');
+        
+        if (currentLoadingVideo) {
+            currentLoadingVideo.muted = false;
+        }
+        
+        if (currentGameVideo) {
+            currentGameVideo.muted = false;
+        }
+        
         soundEnabled = true;
     }
 }, { once: true });
