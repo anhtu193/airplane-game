@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bắt máy bay Vietjet – Chơi là có quà</title>
+    <link rel="icon" type="image/png" href="assets/images/plane.png">
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="game-container">
+        <!-- Decorative GIFs -->
+        <img src="assets/images/mew.gif" alt="Mew" class="corner-gif top-left">
+        <img src="assets/images/sylveon.gif" alt="Sylveon" class="corner-gif bottom-right">
+        
+        <!-- 16:9 Game Screen -->
+        <div class="game-screen">
+            <!-- Video Screen Area -->
+            <video id="loadingVideo" class="game-video active" loop muted autoplay playsinline>
+                <source src="assets/videos/loading_screen.mp4" type="video/mp4">
+                Your browser does not support the video tag.
+            </video>
+            
+            <video id="gameVideo" class="game-video" muted playsinline>
+                <source src="assets/videos/into_game_view.mp4" type="video/mp4">
+                Your browser does not support the video tag.
+            </video>
+            
+            <!-- Start Button Overlay -->
+            <div id="startOverlay" class="start-overlay">
+                <img src="assets/images/logo.png" alt="Vietjet Air" class="game-logo">
+                <button id="startButton" class="start-button">
+                    START
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
+
