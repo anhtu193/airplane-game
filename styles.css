@@ -111,13 +111,13 @@ body {
 
 /* Game Logo */
 .game-logo {
-    width: clamp(250px, 35vw, 400px);
+    width: clamp(650px, 35vw, 800px);
     height: auto;
     image-rendering: pixelated;
     max-width: 80%;
     object-fit: contain;
-    margin-bottom: -70px;
-    margin-top: -80px;
+    margin-bottom: -10px;
+    margin-top: -20px;
 }
 
 .start-button {

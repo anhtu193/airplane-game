@@ -371,7 +371,7 @@ function spawnPlanes() {
     
     // Schedule next plane spawn if we haven't reached the limit
     if (gameState.planesSpawned < gameState.totalPlanes) {
-        const spawnDelay = Math.random() * 2000 + 1000; // 1-3 seconds
+        const spawnDelay = Math.random() * 1500 + 500; // 0.5-2 seconds (faster spawning)
         setTimeout(() => {
             if (gameState.gameActive) {
                 spawnPlanes();
@@ -427,7 +427,7 @@ function createPlane() {
     gameArea.appendChild(plane);
     
     // Animate plane movement
-    const animationDuration = Math.random() * 3000 + 4000; // 4-7 seconds
+    const animationDuration = Math.random() * 2000 + 3000; // 3-5 seconds (faster movement)
     plane.style.transition = `all ${animationDuration}ms linear`;
     
     setTimeout(() => {
@@ -642,7 +642,7 @@ function showLoseScreen() {
     `;
     
     loseContent.innerHTML = `
-        <h2 style="font-family: 'Fernando', sans-serif; font-size: 20px; margin-bottom: 15px; color: #ff6b6b; line-height: 1.3;">
+        <h2 style="font-family: 'Fernando', sans-serif; font-size: 20px; margin-bottom: 15px; color: #ffd700; line-height: 1.3;">
             Bạn suýt bắt được máy bay rồi. Hãy thử lại vào lần sau nhé!
         </h2>
         <p style="font-family: 'Fernando', sans-serif; font-size: 16px; margin-bottom: 25px; line-height: 1.4;">
@@ -819,7 +819,7 @@ function submitRating() {
         left: 0;
         width: 100%;
         height: 100%;
-        background: rgba(0, 0, 0, 0.9);
+        background: rgba(0, 0, 0, 0.7);
         display: flex;
         justify-content: center;
         align-items: center;
@@ -844,8 +844,8 @@ function submitRating() {
             Chúc bạn có 1 chuyến đi vui vẻ và an toàn nhé.
         </p>
         <div style="margin-top: 25px;">
-            <img src="assets/images/mew.gif" alt="Mew" style="width: 80px; height: auto; image-rendering: pixelated;">
-            <img src="assets/images/sylveon.gif" alt="Sylveon" style="width: 80px; height: auto; image-rendering: pixelated; margin-left: 15px;">
+            <!-- <img src="assets/images/mew.gif" alt="Mew" style="width: 80px; height: auto; image-rendering: pixelated;"> -->
+            <!-- <img src="assets/images/sylveon.gif" alt="Sylveon" style="width: 80px; height: auto; image-rendering: pixelated; margin-left: 15px;"> -->
         </div>
     `;
     
@@ -877,6 +877,7 @@ function returnToLoadingScreen() {
         
         <!-- Start Button Overlay -->
         <div id="startOverlay" class="start-overlay">
+            <img src="assets/images/logo.png" alt="Vietjet Air" class="game-logo">
             <button id="startButton" class="start-button">
                 START
             </button>
