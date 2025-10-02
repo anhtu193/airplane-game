@@ -4,6 +4,46 @@ const startOverlay = document.getElementById('startOverlay');
 const loadingVideo = document.getElementById('loadingVideo');
 const gameVideo = document.getElementById('gameVideo');
 
+// Mobile detection
+const isMobile = () => {
+    return window.innerWidth <= 768;
+};
+
+const isSmallMobile = () => {
+    return window.innerWidth <= 480;
+};
+
+// Debug function to check mobile elements
+const debugMobileElements = () => {
+    console.log('Viewport width:', window.innerWidth, 'Mobile:', isMobile());
+    console.log('Document ready state:', document.readyState);
+    
+    if (isMobile()) {
+        console.log('Mobile detected, debugging elements...');
+        console.log('Body height:', document.body.offsetHeight);
+        console.log('Body style:', document.body.style.position);
+        
+        const gameContainer = document.querySelector('.game-container');
+        console.log('Game container height:', gameContainer?.offsetHeight);
+        console.log('Game container style:', gameContainer?.style.cssText);
+        
+        const gameScreen = document.querySelector('.game-screen');
+        console.log('Game screen height:', gameScreen?.offsetHeight);
+        console.log('Game screen visible:', gameScreen?.offsetHeight > 0);
+        
+        const loadingVideo = document.getElementById('loadingVideo');
+        console.log('Loading video exists:', !!loadingVideo);
+        console.log('Loading video active class:', loadingVideo?.classList.contains('active'));
+        console.log('Loading video opacity:', loadingVideo ? getComputedStyle(loadingVideo).opacity : 'N/A');
+        
+        const startOverlay = document.getElementById('startOverlay');
+        console.log('Start overlay exists:', !!startOverlay);
+        console.log('Start overlay hidden class:', startOverlay?.classList.contains('hidden'));
+        
+        console.log('Game area exists:', !!document.querySelector('.game-area'));
+    }
+};
+
 // Survey data
 const surveyQuestions = [
     {
@@ -28,10 +68,41 @@ let surveyAnswers = [];
 
 // Ensure loading video plays on page load
 window.addEventListener('DOMContentLoaded', () => {
+    // Prevent scroll and zoom on mobile
+    if (isMobile()) {
+        document.body.style.overflow = 'hidden';
+        
+        // Prevent double-tap zoom
+        let lastTouchEnd = 0;
+        document.addEventListener('touchend', function (event) {
+            const now = (new Date()).getTime();
+            if (now - lastTouchEnd <= 300) {
+                event.preventDefault();
+            }
+            lastTouchEnd = now;
+        }, false);
+        
+        // Prevent overscroll behavior
+        document.addEventListener('touchmove', function(e) {
+            e.preventDefault();
+        }, { passive: false });
+    }
+    
     loadingVideo.play().catch(err => {
         console.log('Autoplay prevented:', err);
         // If autoplay is blocked, we can try to play on first user interaction
     });
+    
+    // Debug mobile elements
+    debugMobileElements();
+    
+    // Additional debug after a delay
+    setTimeout(() => {
+        if (isMobile()) {
+            console.log('Delayed mobile debug...');
+            debugMobileElements();
+        }
+    }, 1000);
 });
 
 // Handle start button click
@@ -309,14 +380,27 @@ function createGameUI() {
         z-index: 10;
     `;
     
-    // Create hearts for lives
+    // Create hearts for lives with responsive sizing
+    const screenWidth = window.innerWidth;
+    let heartSize = 35;
+    
+    if (screenWidth <= 320) {
+        heartSize = 25;
+    } else if (screenWidth <= 480) {
+        heartSize = 28;
+    } else if (screenWidth <= 768) {
+        heartSize = 35;
+    } else {
+        heartSize = 53;
+    }
+    
     for (let i = 0; i < gameState.lives; i++) {
         const heart = document.createElement('img');
         heart.src = 'assets/images/heart.png';
         heart.className = 'heart';
         heart.style.cssText = `
-            width: 53px;
-            height: 53px;
+            width: ${heartSize}px;
+            height: ${heartSize}px;
             image-rendering: pixelated;
         `;
         livesDisplay.appendChild(heart);
@@ -409,10 +493,25 @@ function createPlane() {
     
     plane.src = 'assets/images/plane.png';
     plane.className = 'flying-plane';
+    
+    // Responsive sizing based on screen width
+    const screenWidth = window.innerWidth;
+    let planeSize = 60; // Default size
+    
+    if (screenWidth <= 320) {
+        planeSize = 40;
+    } else if (screenWidth <= 480) {
+        planeSize = 50;
+    } else if (screenWidth <= 768) {
+        planeSize = 60;
+    } else {
+        planeSize = 75;
+    }
+    
     plane.style.cssText = `
         position: absolute;
-        width: 75px;
-        height: 53px;
+        width: ${planeSize}px;
+        height: ${Math.round(planeSize * 0.7)}px;
         image-rendering: pixelated;
         cursor: pointer;
         z-index: 6;
@@ -422,6 +521,7 @@ function createPlane() {
         -moz-user-select: none;
         -ms-user-select: none;
         pointer-events: auto;
+        touch-action: manipulation;
         ${isFlipped ? 'transform: scaleX(-1);' : ''}
     `;
     
@@ -525,9 +625,24 @@ function catchPlane(plane) {
     const collectedArea = document.querySelector('.collected-planes');
     const collectedPlane = document.createElement('img');
     collectedPlane.src = 'assets/images/plane-2.png';
+    
+    // Responsive sizing for collected planes
+    const screenWidth = window.innerWidth;
+    let collectedSize = 45;
+    
+    if (screenWidth <= 320) {
+        collectedSize = 30;
+    } else if (screenWidth <= 480) {
+        collectedSize = 35;
+    } else if (screenWidth <= 768) {
+        collectedSize = 40;
+    } else {
+        collectedSize = 45;
+    }
+    
     collectedPlane.style.cssText = `
-        width: 60px;
-        height: 45px;
+        width: ${collectedSize + 15}px;
+        height: ${collectedSize}px;
         image-rendering: pixelated;
         opacity: 0;
         transition: opacity 0.5s ease;

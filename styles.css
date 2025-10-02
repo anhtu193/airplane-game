@@ -192,36 +192,112 @@ body {
     animation: none;
 }
 
-/* Responsive adjustments */
-@media (max-width: 768px) {
+/* Mobile responsive design */
+@media screen and (max-width: 768px) {
+    body {
+        padding: 0;
+        overflow: hidden;
+        margin: 0;
+        padding: 0;
+    }
+    
     .game-container {
-        padding: 10px;
+        padding: 5px;
+        min-height: 100vh;
+        width: 100%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
     }
     
     .game-screen {
-        border-width: 6px;
+        width: 95%;
+        max-width: none;
+        height: auto;
+        aspect-ratio: 16/9;
+        border-width: 4px;
+        border-radius: 4px;
         box-shadow: 
-            0 0 0 3px #666,
-            0 0 0 6px #333,
+            0 0 0 2px #000,
+            0 0 0 4px #fff,
             0 10px 30px rgba(0, 0, 0, 0.8);
+        display: block;
+        position: relative;
+    }
+    
+    .game-video {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100% !important;
+        height: 100% !important;
+        object-fit: cover;
     }
     
     .start-overlay {
-        padding-top: 6%;
+        padding-top: 10%;
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-start;
+        align-items: center;
+        z-index: 10;
     }
     
     .game-logo {
-        width: clamp(150px, 30vw, 250px);
-        margin-bottom: 40px;
+        width: clamp(120px, 50vw, 200px);
+        margin-bottom: clamp(20px, 8vh, 40px);
     }
     
     .start-button {
-        font-size: clamp(10px, 2vw, 16px);
-        padding: 12px 24px;
+        font-size: clamp(8px, 3vw, 14px);
+        padding: clamp(8px, 2vh, 12px) clamp(20px, 8vw, 30px);
+        letter-spacing: 1px;
         text-shadow: 
             1px 1px 0px #0066cc,
-            2px 2px 0px #004499,
-            3px 3px 0px #003366;
+            2px 2px 0px #004499;
+    }
+    
+    /* Ensure active videos are visible on mobile */
+    .game-video.active {
+        opacity: 1 !important;
+        pointer-events: auto !important;
+        visibility: visible !important;
+    }
+    
+    /* Hide corner GIFs on mobile */
+    .corner-gif {
+        display: none;
+    }
+}
+
+@media screen and (max-width: 480px) {
+    .game-screen {
+        width: 98%;
+        border-width: 3px;
+        border-radius: 3px;
+        box-shadow: 
+            0 0 0 1px #000,
+            0 0 0 3px #fff,
+            0 8px 20px rgba(0, 0, 0, 0.8);
+    }
+    
+    .start-overlay {
+        padding-top: 8%;
+    }
+    
+    .game-logo {
+        width: clamp(100px, 60vw, 150px);
+        margin-bottom: clamp(15px, 6vh, 25px);
+    }
+    
+    .start-button {
+        font-size: clamp(7px, 2.5vw, 12px);
+        padding: clamp(6px, 1.5vh, 10px) clamp(15px, 6vw, 25px);
     }
 }
 
@@ -408,61 +484,285 @@ body {
         0 3px 10px rgba(0, 0, 0, 0.3);
 }
 
-@media (max-width: 768px) {
+/* Mobile responsive for survey screens */
+@media screen and (max-width: 768px) {
     .notification-content,
     .question-content,
     .intro-content {
-        padding: 30px 20px;
-        margin: 20px;
+        padding: 25px 15px;
+        margin: 15px;
+        max-width: none;
+        width: calc(100% - 30px);
+        border-radius: 15px;
+        border-width: 3px;
+    }
+    
+    .notification-content h2,
+    .question-content h2,
+    .intro-content h2 {
+        font-size: clamp(14px, 4vw, 18px);
+        margin-bottom: 15px;
+    }
+    
+    .notification-content p,
+    .question-content p.question-text,
+    .intro-content p {
+        font-size: clamp(13px, 3.5vw, 16px);
+        margin-bottom: 20px;
+    }
+    
+    .notification-btn,
+    .start-game-btn {
+        font-size: clamp(12px, 3vw, 15px);
+        padding: 12px 20px;
+        border-width: 2px;
     }
     
     .answers-container {
-        gap: 12px;
+        gap: 10px;
+        margin-top: 15px;
+    }
+    
+    .answer-btn {
+        padding: 12px 16px;
+        font-size: clamp(12px, 3vw, 15px);
+        border-width: 2px;
+    }
+}
+
+@media screen and (max-width: 480px) {
+    .notification-content,
+    .question-content,
+    .intro-content {
+        border-radius: 12px;
+        border-width: 2px;
+    }
+    
+    .notification-content h2,
+    .question-content h2,
+    .intro-content h2 {
+        font-size: clamp(12px, 4vw, 16px);
+    }
+    
+    .notification-content p,
+    .question-content p.question-text,
+    .intro-content p {
+        font-size: clamp(11px, 3vw, 14px);
+        line-height: 1.5;
+    }
+    
+    .notification-btn,
+    .start-game-btn {
+        font-size: 12px;
+        padding: 10px 16px;
+    }
+    
+    .answers-container {
+        gap: 8px;
+    }
+    
+    .answer-btn {
+        padding: 10px 14px;
+        font-size: 12px;
+    }
+}
+
+/* Game UI Elements Styles */
+.lives-display {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    display: flex;
+    gap: 5px;
+    z-index: 10;
+}
+
+.lives-display .heart {
+    width: 35px;
+    height: 35px;
+    image-rendering: pixelated;
+}
+
+.score-display {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    color: #ffffff;
+    font-family: 'Press Start 2P', cursive;
+    font-size: 12px;
+    text-shadow: 2px 2px 0px #000000;
+    z-index: 10;
+}
+
+.collected-planes {
+    position: absolute;
+    bottom: 10px;
+    left: 10px;
+    display: flex;
+    gap: 5px;
+    z-index: 10;
+}
+
+.collected-planes img {
+    width: 45px;
+    height: 35px;
+    image-rendering: pixelated;
+}
+
+.flying-plane {
+    width: 60px;
+    height: 45px;
+    image-rendering: pixelated;
+}
+
+@media screen and (max-width: 480px) {
+    .game-screen {
+        border-width: 3px;
+        border-radius: 3px;
+        box-shadow: 
+            0 0 0 1px #000,
+            0 0 0 3px #fff,
+            0 8px 20px rgba(0, 0, 0, 0.8);
+    }
+    
+    .start-overlay {
+        padding-top: 8%;
+    }
+    
+    .game-logo {
+        width: clamp(100px, 60vw, 150px);
+        margin-bottom: clamp(15px, 6vh, 25px);
+    }
+    
+    .start-button {
+        font-size: clamp(7px, 2.5vw, 12px);
+        padding: clamp(6px, 1.5vh, 10px) clamp(15px, 6vw, 25px);
+    }
+    
+    .notification-content,
+    .question-content,
+    .intro-content {
+        padding: 20px 15px;
+        margin: 10px;
+        max-width: none;
+        width: calc(100% - 20px);
     }
     
     .answer-btn {
         padding: 12px 16px;
         font-size: 14px;
     }
+    
+    /* Optimize game UI for small screens */
+    .lives-display {
+        top: 8px;
+        left: 8px;
+        gap: 3px;
+    }
+    
+    .lives-display .heart {
+        width: 28px;
+        height: 28px;
+    }
+    
+    .score-display {
+        top: 8px;
+        right: 8px;
+        font-size: 10px;
+    }
+    
+    .collected-planes {
+        bottom: 8px;
+        left: 8px;
+        gap: 3px;
+    }
+    
+    .collected-planes img {
+        width: 35px;
+        height: 28px;
+    }
+    
+    .flying-plane {
+        width: 50px;
+        height: 38px;
+    }
 }
 
-@media (max-width: 480px) {
-    .game-screen {
-        border-width: 4px;
-        border-radius: 4px;
-        box-shadow: 
-            0 0 0 2px #666,
-            0 0 0 4px #333,
-            0 10px 20px rgba(0, 0, 0, 0.8);
-    }
-    
-    .start-overlay {
-        padding-top: 5%;
-    }
-    
-    .game-logo {
-        width: clamp(120px, 35vw, 200px);
-        margin-bottom: 30px;
-    }
-    
-    .start-button {
-        font-size: 10px;
-        padding: 10px 20px;
-        text-shadow: 
-            1px 1px 0px #0066cc,
-            2px 2px 0px #004499;
-    }
-    
-    .notification-content,
-    .question-content,
-    .intro-content {
-        padding: 25px 15px;
-        margin: 15px;
-    }
-    
+/* Touch-friendly improvements */
+@media screen and (max-width: 768px) {
+    .start-button,
+    .notification-btn,
+    .start-game-btn,
     .answer-btn {
-        padding: 10px 14px;
-        font-size: 13px;
+        min-height: 44px; /* Apple's recommended minimum touch target */
+        min-width: 44px;
+    }
+    
+    /* Improve button touch targets for game interactions */
+    .game-area {
+        cursor: pointer;
+    }
+    
+    .flying-plane {
+        cursor: pointer;
+        min-width: 44px;
+        min-height: 44px;
+        touch-action: manipulation;
+        -webkit-touch-callout: none;
+        -webkit-user-select: none;
+        -khtml-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+        user-select: none;
+    }
+}
+
+/* Game end screens responsive */
+@media screen and (max-width: 768px) {
+    .game-end-screen,
+    .final-screen {
+        padding: 15px;
+    }
+    
+    .game-end-screen h2,
+    .final-screen h2 {
+        font-size: clamp(16px, 4vw, 20px);
+        margin-bottom: 15px;
+        line-height: 1.3;
+    }
+    
+    .game-end-screen p,
+    .final-screen p {
+        font-size: clamp(14px, 3vw, 16px);
+        margin-bottom: 20px;
+    }
+    
+    .game-end-screen img {
+        width: clamp(150px, 40vw, 200px);
+        height: clamp(150px, 40vw, 200px);
+        margin-top: 15px;
+    }
+}
+
+@media screen and (max-width: 480px) {
+    .game-end-screen,
+    .final-screen {
+        padding: 10px;
+    }
+    
+    .game-end-screen h2,
+    .final-screen h2 {
+        font-size: clamp(14px, 4vw, 18px);
+    }
+    
+    .game-end-screen p,
+    .final-screen p {
+        font-size: clamp(12px, 3vw, 14px);
+    }
+    
+    .game-end-screen img {
+        width: clamp(120px, 50vw, 160px);
+        height: clamp(120px, 50vw, 160px);
     }
 }
 
