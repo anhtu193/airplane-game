@@ -511,20 +511,68 @@ function showGameIntroduction() {
         introOverlay.className = 'game-intro-overlay';
         introOverlay.innerHTML = `
             <div class="intro-content">
-                <h2>🎮 Hướng dẫn trò chơi</h2>
-                <div style="text-align: left; margin: 15px 0;">
-                    <p style="margin-bottom: 12px; font-size: 14px;">📋 <strong>Nhiệm vụ:</strong></p>
-                    <p style="margin-bottom: 8px; padding-left: 15px; font-size: 13px;">• Bắt <span style="color: #ffd700; font-weight: bold;">6/10 máy bay</span> để thắng</p>
-                    <p style="margin-bottom: 12px; padding-left: 15px; font-size: 13px;">• Có <span style="color: #ff6b6b; font-weight: bold;">3 mạng</span> để thực hiện</p>
+                <h2>🎮 Chọn chế độ chơi</h2>
+                <div style="text-align: center; margin: 20px 0;">
+                    <p style="margin-bottom: 20px; font-size: 14px; color: #ffffff;">
+                        Chọn một trong 3 chế độ chơi thú vị:
+                    </p>
                     
-                    <p style="margin-bottom: 12px; font-size: 14px;">🎯 <strong>Cách chơi:</strong></p>
-                    <p style="margin-bottom: 8px; padding-left: 15px; font-size: 13px;">• Chạm vào máy bay để bắt</p>
-                    <p style="margin-bottom: 12px; padding-left: 15px; font-size: 13px;">• Chạm trượt mất 1 mạng</p>
-                    
-                    <p style="margin-bottom: 12px; font-size: 14px;">🏆 <strong>Phần thưởng:</strong></p>
-                    <p style="margin-bottom: 8px; padding-left: 15px; font-size: 13px;">• Nhận một phần quà bí mật từ Vietjet!</p>
+                    <div class="game-modes-container" style="display: flex; flex-direction: column; gap: 15px; margin: 20px 0;">
+                        <div class="game-mode-btn" onclick="playButtonSoundAndExecute(() => selectGameMode('standard'))" style="
+                            background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
+                            border: 3px solid #2a1a4a;
+                            border-radius: 12px;
+                            padding: 15px;
+                            cursor: pointer;
+                            transition: all 0.3s ease;
+                            text-align: left;
+                        ">
+                            <div style="display: flex; align-items: center; gap: 10px;">
+                                <span style="font-size: 24px;">🎯</span>
+                                <div>
+                                    <h3 style="margin: 0; font-size: 16px; color: #ffffff;">Chế độ Chuẩn</h3>
+                                    <p style="margin: 5px 0 0 0; font-size: 12px; color: #e0e0e0;">Bắt 6/10 máy bay để thắng</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="game-mode-btn" onclick="playButtonSoundAndExecute(() => selectGameMode('speed'))" style="
+                            background: linear-gradient(135deg, #FF9800 0%, #F57C00 100%);
+                            border: 3px solid #2a1a4a;
+                            border-radius: 12px;
+                            padding: 15px;
+                            cursor: pointer;
+                            transition: all 0.3s ease;
+                            text-align: left;
+                        ">
+                            <div style="display: flex; align-items: center; gap: 10px;">
+                                <span style="font-size: 24px;">⚡</span>
+                                <div>
+                                    <h3 style="margin: 0; font-size: 16px; color: #ffffff;">Chế độ Tốc độ</h3>
+                                    <p style="margin: 5px 0 0 0; font-size: 12px; color: #e0e0e0;">30 giây bắt càng nhiều càng tốt!</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="game-mode-btn" onclick="playButtonSoundAndExecute(() => selectGameMode('challenge'))" style="
+                            background: linear-gradient(135deg, #9C27B0 0%, #7B1FA2 100%);
+                            border: 3px solid #2a1a4a;
+                            border-radius: 12px;
+                            padding: 15px;
+                            cursor: pointer;
+                            transition: all 0.3s ease;
+                            text-align: left;
+                        ">
+                            <div style="display: flex; align-items: center; gap: 10px;">
+                                <span style="font-size: 24px;">🎮</span>
+                                <div>
+                                    <h3 style="margin: 0; font-size: 16px; color: #ffffff;">Chế độ Thử thách</h3>
+                                    <p style="margin: 5px 0 0 0; font-size: 12px; color: #e0e0e0;">Máy bay có kích thước khác nhau</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-                <button class="start-game-btn" onclick="playButtonSoundAndExecute(startGame)">🚀  Bắt đầu chơi</button>
             </div>
         `;
         
@@ -537,8 +585,49 @@ function showGameIntroduction() {
     }, 400);
 }
 
+// Game modes
+const GAME_MODES = {
+    STANDARD: {
+        id: 'standard',
+        name: 'Chế độ Chuẩn',
+        description: 'Bắt 6/10 máy bay để thắng',
+        icon: '🎯',
+        targetScore: 6,
+        totalPlanes: 10,
+        lives: 3,
+        timeLimit: null,
+        planeSpeed: 1.0,
+        planeSize: 1.0
+    },
+    SPEED: {
+        id: 'speed',
+        name: 'Chế độ Tốc độ',
+        description: '30 giây bắt càng nhiều càng tốt!',
+        icon: '⚡',
+        targetScore: null,
+        totalPlanes: null,
+        lives: 3,
+        timeLimit: 30,
+        planeSpeed: 1.5,
+        planeSize: 1.0
+    },
+    CHALLENGE: {
+        id: 'challenge',
+        name: 'Chế độ Thử thách',
+        description: 'Máy bay có kích thước khác nhau',
+        icon: '🎮',
+        targetScore: 6,
+        totalPlanes: 10,
+        lives: 3,
+        timeLimit: null,
+        planeSpeed: 1.0,
+        planeSize: 'variable'
+    }
+};
+
 // Game state
 let gameState = {
+    mode: 'standard',
     score: 0,
     lives: 3,
     targetScore: 6,
@@ -546,11 +635,23 @@ let gameState = {
     planesSpawned: 0,
     gameActive: false,
     planes: [],
-    collectedPlanes: []
+    collectedPlanes: [],
+    timeLeft: null,
+    gameTimer: null
 };
 
-// Start game
-function startGame() {
+// Select game mode
+function selectGameMode(modeId) {
+    console.log('Selected game mode:', modeId);
+    
+    // Update game state with selected mode
+    const mode = GAME_MODES[modeId.toUpperCase()];
+    gameState.mode = modeId;
+    gameState.targetScore = mode.targetScore;
+    gameState.totalPlanes = mode.totalPlanes;
+    gameState.lives = mode.lives;
+    gameState.timeLeft = mode.timeLimit;
+    
     // Hide intro overlay
     const introOverlay = document.querySelector('.game-intro-overlay');
     if (introOverlay) {
@@ -560,8 +661,13 @@ function startGame() {
         }, 300);
     }
     
-    // Initialize game
+    // Initialize game with selected mode
     initializeGame();
+}
+
+// Start game (legacy function for backward compatibility)
+function startGame() {
+    selectGameMode('standard');
 }
 
 // Initialize the gameplay
@@ -579,7 +685,12 @@ function initializeGame() {
     gameState.gameActive = true;
     spawnPlanes();
     
-    console.log('Game started with survey answers:', surveyAnswers);
+    // Start timer for speed mode
+    if (gameState.mode === 'speed' && gameState.timeLeft !== null) {
+        startGameTimer();
+    }
+    
+    console.log('Game started with mode:', gameState.mode, 'survey answers:', surveyAnswers);
 }
 
 // Create game UI elements
@@ -644,7 +755,14 @@ function createGameUI() {
     // Create score display
     const scoreDisplay = document.createElement('div');
     scoreDisplay.className = 'score-display';
-    scoreDisplay.innerHTML = `${gameState.score}/${gameState.targetScore}`;
+    
+    // Update score display based on game mode
+    if (gameState.mode === 'speed') {
+        scoreDisplay.innerHTML = `Score: ${gameState.score}`;
+    } else {
+        scoreDisplay.innerHTML = `${gameState.score}/${gameState.targetScore}`;
+    }
+    
     scoreDisplay.style.cssText = `
         position: absolute;
         top: 20px;
@@ -655,6 +773,24 @@ function createGameUI() {
         text-shadow: 2px 2px 0px #000000;
         z-index: 10;
     `;
+    
+    // Create timer display for speed mode
+    if (gameState.mode === 'speed' && gameState.timeLeft !== null) {
+        const timerDisplay = document.createElement('div');
+        timerDisplay.className = 'timer-display';
+        timerDisplay.innerHTML = `Time: ${gameState.timeLeft}s`;
+        timerDisplay.style.cssText = `
+            position: absolute;
+            top: 60px;
+            right: 20px;
+            color: #ffd700;
+            font-family: 'Press Start 2P', cursive;
+            font-size: 12px;
+            text-shadow: 2px 2px 0px #000000;
+            z-index: 10;
+        `;
+        gameScreen.appendChild(timerDisplay);
+    }
     
     // Create collected planes area
     const collectedArea = document.createElement('div');
@@ -697,9 +833,44 @@ function createGameUI() {
     gameScreen.appendChild(collectedArea);
 }
 
+// Start game timer for speed mode
+function startGameTimer() {
+    gameState.gameTimer = setInterval(() => {
+        gameState.timeLeft--;
+        const timerDisplay = document.querySelector('.timer-display');
+        if (timerDisplay) {
+            timerDisplay.innerHTML = `Time: ${gameState.timeLeft}s`;
+        }
+        
+        if (gameState.timeLeft <= 0) {
+            clearInterval(gameState.gameTimer);
+            // Speed mode: time's up - player wins automatically
+            gameWin();
+        }
+    }, 1000);
+}
+
 // Spawn planes randomly
 function spawnPlanes() {
-    if (!gameState.gameActive || gameState.planesSpawned >= gameState.totalPlanes) return;
+    if (!gameState.gameActive) return;
+    
+    // For speed mode, spawn continuously until time runs out
+    if (gameState.mode === 'speed') {
+        const plane = createPlane();
+        gameState.planes.push(plane);
+        
+        // Schedule next plane spawn (faster for speed mode)
+        const spawnDelay = Math.random() * 800 + 300; // 0.3-1.1 seconds
+        setTimeout(() => {
+            if (gameState.gameActive) {
+                spawnPlanes();
+            }
+        }, spawnDelay);
+        return;
+    }
+    
+    // For other modes, spawn limited number of planes
+    if (gameState.planesSpawned >= gameState.totalPlanes) return;
     
     // Create a new plane
     const plane = createPlane();
@@ -708,7 +879,7 @@ function spawnPlanes() {
     
     // Schedule next plane spawn if we haven't reached the limit
     if (gameState.planesSpawned < gameState.totalPlanes) {
-        const spawnDelay = Math.random() * 1500 + 500; // 0.5-2 seconds (faster spawning)
+        const spawnDelay = Math.random() * 1500 + 500; // 0.5-2 seconds
         setTimeout(() => {
             if (gameState.gameActive) {
                 spawnPlanes();
@@ -729,19 +900,43 @@ function createPlane() {
     plane.src = 'assets/images/plane.png';
     plane.className = 'flying-plane';
     
-    // Responsive sizing based on screen width
+    // Get current game mode
+    const mode = GAME_MODES[gameState.mode.toUpperCase()];
+    
+    // Responsive sizing based on screen width and game mode
     const screenWidth = window.innerWidth;
     let planeSize = 60; // Default size
     
-    if (screenWidth <= 320) {
-        planeSize = 40;
-    } else if (screenWidth <= 480) {
-        planeSize = 50;
-    } else if (screenWidth <= 768) {
-        planeSize = 60;
+    // Challenge mode: variable plane sizes
+    if (gameState.mode === 'challenge') {
+        const sizeTypes = [
+            { size: 40, taps: 1, color: '#4CAF50' }, // Small - 1 tap
+            { size: 60, taps: 2, color: '#FF9800' }, // Medium - 2 taps
+            { size: 80, taps: 3, color: '#F44336' }, // Large - 3 taps
+            { size: 100, taps: 5, color: '#9C27B0' } // Extra Large - 5 taps
+        ];
+        const selectedType = sizeTypes[Math.floor(Math.random() * sizeTypes.length)];
+        planeSize = selectedType.size;
+        plane.tapsRequired = selectedType.taps;
+        plane.tapsCount = 0;
+        plane.sizeType = selectedType;
     } else {
-        planeSize = 75;
+        // Standard and Speed modes: normal sizing
+        if (screenWidth <= 320) {
+            planeSize = 40;
+        } else if (screenWidth <= 480) {
+            planeSize = 50;
+        } else if (screenWidth <= 768) {
+            planeSize = 60;
+        } else {
+            planeSize = 75;
+        }
+        plane.tapsRequired = 1;
+        plane.tapsCount = 0;
     }
+    
+    // Apply mode-specific speed multiplier
+    const speedMultiplier = mode.planeSpeed;
     
     plane.style.cssText = `
         position: absolute;
@@ -759,6 +954,32 @@ function createPlane() {
         touch-action: manipulation;
         ${isFlipped ? 'transform: scaleX(-1);' : ''}
     `;
+    
+    // Add visual indicator for challenge mode
+    if (gameState.mode === 'challenge') {
+        const indicator = document.createElement('div');
+        indicator.className = 'tap-indicator';
+        indicator.innerHTML = `${plane.tapsRequired}`;
+        indicator.style.cssText = `
+            position: absolute;
+            top: -20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: ${plane.sizeType.color};
+            color: white;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 10px;
+            font-weight: bold;
+            border: 2px solid white;
+            z-index: 7;
+        `;
+        plane.appendChild(indicator);
+    }
     
     // Random vertical position
     const topPosition = Math.random() * 60 + 20; // 20% to 80% of screen height
@@ -798,8 +1019,9 @@ function createPlane() {
     // Add to game area
     gameArea.appendChild(plane);
     
-    // Animate plane movement
-    const animationDuration = Math.random() * 2000 + 3000; // 3-5 seconds (faster movement)
+    // Animate plane movement with mode-specific speed
+    const baseDuration = Math.random() * 2000 + 3000; // 3-5 seconds base
+    const animationDuration = baseDuration / speedMultiplier; // Faster for speed mode
     plane.style.transition = `all ${animationDuration}ms linear`;
     
     setTimeout(() => {
@@ -841,6 +1063,32 @@ function createPlane() {
 function catchPlane(plane) {
     if (!gameState.gameActive) return;
     
+    // Challenge mode: handle multiple taps
+    if (gameState.mode === 'challenge') {
+        plane.tapsCount++;
+        
+        // Update tap indicator
+        const indicator = plane.querySelector('.tap-indicator');
+        if (indicator) {
+            indicator.innerHTML = `${plane.tapsRequired - plane.tapsCount}`;
+            if (plane.tapsCount >= plane.tapsRequired) {
+                indicator.style.background = '#4CAF50'; // Green when complete
+            }
+        }
+        
+        // Play plane tap sound (instant)
+        SoundManager.playTapSound();
+        
+        // Check if enough taps
+        if (plane.tapsCount < plane.tapsRequired) {
+            return; // Need more taps
+        }
+    } else {
+        // Standard and Speed modes: single tap
+        // Play plane tap sound (instant)
+        SoundManager.playTapSound();
+    }
+    
     // Mark plane as caught to prevent life loss
     plane.classList.add('caught');
     plane.classList.remove('flying-plane');
@@ -848,16 +1096,17 @@ function catchPlane(plane) {
     plane.style.transition = 'opacity 0.5s ease';
     plane.style.opacity = '0';
     
-    // Play plane tap sound (instant)
-    SoundManager.playTapSound();
-    
     // Add to collected planes
     gameState.score++;
     gameState.collectedPlanes.push(plane);
     
-    // Update score display
+    // Update score display based on mode
     const scoreDisplay = document.querySelector('.score-display');
-    scoreDisplay.innerHTML = `${gameState.score}/${gameState.targetScore}`;
+    if (gameState.mode === 'speed') {
+        scoreDisplay.innerHTML = `Score: ${gameState.score}`;
+    } else {
+        scoreDisplay.innerHTML = `${gameState.score}/${gameState.targetScore}`;
+    }
     
     // Add collected plane to bottom left
     const collectedArea = document.querySelector('.collected-planes');
@@ -903,9 +1152,15 @@ function catchPlane(plane) {
         }
     }, 500);
     
-    // Check win condition
-    if (gameState.score >= gameState.targetScore) {
-        gameWin();
+    // Check win condition based on game mode
+    if (gameState.mode === 'speed') {
+        // Speed mode: timer handles win condition
+        // No need to check here
+    } else {
+        // Standard and Challenge modes: check target score
+        if (gameState.score >= gameState.targetScore) {
+            gameWin();
+        }
     }
 }
 
@@ -929,11 +1184,17 @@ function loseLife() {
 function gameWin() {
     gameState.gameActive = false;
     
+    // Clear game timer if running
+    if (gameState.gameTimer) {
+        clearInterval(gameState.gameTimer);
+        gameState.gameTimer = null;
+    }
+    
     // Play game win sound and stop gameplay music
     SoundManager.stop(gameplayMusic);
     SoundManager.play(gameWinSound);
     
-    console.log('You won!');
+    console.log('You won! Mode:', gameState.mode, 'Score:', gameState.score);
     showWinScreen();
 }
 
@@ -941,11 +1202,17 @@ function gameWin() {
 function gameLose() {
     gameState.gameActive = false;
     
+    // Clear game timer if running
+    if (gameState.gameTimer) {
+        clearInterval(gameState.gameTimer);
+        gameState.gameTimer = null;
+    }
+    
     // Play game over sound and stop gameplay music
     SoundManager.stop(gameplayMusic);
     SoundManager.play(gameOverSound);
     
-    console.log('You lost!');
+    console.log('You lost! Mode:', gameState.mode, 'Score:', gameState.score);
     showLoseScreen();
 }
 
@@ -979,8 +1246,14 @@ function showWinScreen() {
     
     winContent.innerHTML = `
         <h2 style="font-family: 'Fernando', sans-serif; font-size: 20px; margin-bottom: 15px; color: #ffd700; line-height: 1.3;">
-            Chúc mừng! Bạn đã bắt được các máy bay Vietjet
+            Chúc mừng! Bạn đã hoàn thành ${GAME_MODES[gameState.mode.toUpperCase()].icon} ${GAME_MODES[gameState.mode.toUpperCase()].name}
         </h2>
+        <p style="font-family: 'Fernando', sans-serif; font-size: 14px; margin-bottom: 10px; line-height: 1.4;">
+            ${gameState.mode === 'speed' ? 
+                `Điểm số: ${gameState.score} máy bay trong 30 giây!` : 
+                `Bạn đã bắt được ${gameState.score}/${gameState.targetScore} máy bay!`
+            }
+        </p>
         <p style="font-family: 'Fernando', sans-serif; font-size: 16px; margin-bottom: 20px; line-height: 1.4;">
             Tuyệt vời! Đây là phần quà dành cho bạn. Hãy nhận voucher ngay nhé.
         </p>
@@ -1045,8 +1318,14 @@ function showLoseScreen() {
     
     loseContent.innerHTML = `
         <h2 style="font-family: 'Fernando', sans-serif; font-size: 20px; margin-bottom: 15px; color: #ffd700; line-height: 1.3;">
-            Bạn suýt bắt được máy bay rồi. Hãy thử lại vào lần sau nhé!
+            ${GAME_MODES[gameState.mode.toUpperCase()].icon} ${GAME_MODES[gameState.mode.toUpperCase()].name} - Thử lại nhé!
         </h2>
+        <p style="font-family: 'Fernando', sans-serif; font-size: 14px; margin-bottom: 10px; line-height: 1.4;">
+            ${gameState.mode === 'speed' ? 
+                `Điểm số: ${gameState.score} máy bay` : 
+                `Bạn đã bắt được ${gameState.score}/${gameState.targetScore} máy bay`
+            }
+        </p>
         <p style="font-family: 'Fernando', sans-serif; font-size: 16px; margin-bottom: 25px; line-height: 1.4;">
             Không sao, Vietjet vẫn luôn đồng hành cùng bạn trong mọi hành trình!
         </p>
@@ -1103,6 +1382,16 @@ function showRatingScreen() {
     `;
     
     ratingContent.innerHTML = `
+        <div style="margin-bottom: 15px; text-align: center;">
+            <img src="assets/images/contryside.png" alt="Countryside" style="
+                width: 250px;
+                height: auto;
+                border-radius: 8px;
+                border: 2px solid #ffffff;
+                box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+                opacity: 0.9;
+            ">
+        </div>
         <h2 style="font-family: 'Fernando', sans-serif; font-size: 20px; margin-bottom: 20px; line-height: 1.6;">
             Bạn có hài lòng với dịch vụ hôm nay không?
         </h2>
