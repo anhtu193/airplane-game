@@ -17,6 +17,9 @@ const gameplayMusic = document.getElementById('gameplayMusic');
 // Single tap sound (simplified approach)
 let tapSoundLastPlayTime = 0;
 
+// Loading sound state tracking
+let loadingSoundPlaying = false;
+
 // Sound Manager
 const SoundManager = {
     enabled: true,
@@ -200,11 +203,14 @@ window.addEventListener('DOMContentLoaded', () => {
         // Always enable audio on user interaction
         SoundManager.enabled = true;
         
-        // Only play loading sound if we're still on loading screen
-        if (loadingSound && !startOverlay.classList.contains('hidden')) {
+        // Only play loading sound if we're still on loading screen and not already playing
+        if (loadingSound && !startOverlay.classList.contains('hidden') && !loadingSoundPlaying) {
             loadingSound.loop = true;
             SoundManager.play(loadingSound);
+            loadingSoundPlaying = true;
             console.log('Loading sound played after user interaction');
+        } else {
+            console.log('Loading sound already playing or not needed, skipping');
         }
         
         console.log('Audio system enabled');
@@ -313,9 +319,12 @@ window.addEventListener('DOMContentLoaded', () => {
         // Retry loading sound after delay if not playing and still on loading screen
         console.log('Checking loading sound after delay...');
         console.log('SoundManager enabled:', SoundManager.enabled);
-        if (loadingSound && SoundManager.enabled && !startOverlay.classList.contains('hidden')) {
+        if (loadingSound && SoundManager.enabled && !startOverlay.classList.contains('hidden') && !loadingSoundPlaying) {
             console.log('Retrying loading sound playback...');
             SoundManager.play(loadingSound);
+            loadingSoundPlaying = true;
+        } else {
+            console.log('Loading sound already playing or not needed, skipping retry');
         }
         
     }, 1000);
@@ -328,6 +337,7 @@ startButton.addEventListener('click', () => {
     
     // Stop loading screen music first
     SoundManager.stop(loadingSound);
+    loadingSoundPlaying = false;
     
     // Play game start sound
     SoundManager.play(gameStartSound);
@@ -792,6 +802,58 @@ function createGameUI() {
         gameScreen.appendChild(timerDisplay);
     }
     
+    // Create global health bar for challenge mode
+    if (gameState.mode === 'challenge') {
+        const globalHealthContainer = document.createElement('div');
+        globalHealthContainer.className = 'global-health-container';
+        globalHealthContainer.style.cssText = `
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            width: 200px;
+            height: 20px;
+            background: rgba(0, 0, 0, 0.7);
+            border: 2px solid #ffffff;
+            border-radius: 10px;
+            z-index: 10;
+            overflow: hidden;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        `;
+        
+        const globalHealthBar = document.createElement('div');
+        globalHealthBar.className = 'global-health-bar';
+        globalHealthBar.style.cssText = `
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, #4CAF50 0%, #FF9800 50%, #F44336 100%);
+            transition: width 0.3s ease;
+            border-radius: 8px;
+        `;
+        
+        const globalHealthLabel = document.createElement('div');
+        globalHealthLabel.className = 'global-health-label';
+        globalHealthLabel.innerHTML = 'Target Health';
+        globalHealthLabel.style.cssText = `
+            position: absolute;
+            top: -25px;
+            left: 0;
+            color: #ffffff;
+            font-family: 'Press Start 2P', cursive;
+            font-size: 8px;
+            text-shadow: 1px 1px 0px #000000;
+        `;
+        
+        globalHealthContainer.appendChild(globalHealthBar);
+        globalHealthContainer.appendChild(globalHealthLabel);
+        gameScreen.appendChild(globalHealthContainer);
+        
+        // Store reference for updates
+        gameState.globalHealthBar = globalHealthBar;
+        gameState.globalHealthContainer = globalHealthContainer;
+        gameState.currentTargetPlane = null;
+    }
+    
     // Create collected planes area
     const collectedArea = document.createElement('div');
     collectedArea.className = 'collected-planes';
@@ -955,30 +1017,42 @@ function createPlane() {
         ${isFlipped ? 'transform: scaleX(-1);' : ''}
     `;
     
-    // Add visual indicator for challenge mode
+    // Add health bar for challenge mode
     if (gameState.mode === 'challenge') {
-        const indicator = document.createElement('div');
-        indicator.className = 'tap-indicator';
-        indicator.innerHTML = `${plane.tapsRequired}`;
-        indicator.style.cssText = `
+        // Create health bar container
+        const healthBarContainer = document.createElement('div');
+        healthBarContainer.className = 'health-bar-container';
+        healthBarContainer.style.cssText = `
             position: absolute;
-            top: -20px;
+            bottom: -25px;
             left: 50%;
             transform: translateX(-50%);
-            background: ${plane.sizeType.color};
-            color: white;
-            border-radius: 50%;
-            width: 20px;
-            height: 20px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 10px;
-            font-weight: bold;
-            border: 2px solid white;
+            width: ${planeSize}px;
+            height: 8px;
+            background: rgba(0, 0, 0, 0.5);
+            border-radius: 4px;
+            border: 1px solid #ffffff;
             z-index: 7;
+            overflow: hidden;
         `;
-        plane.appendChild(indicator);
+        
+        // Create health bar
+        const healthBar = document.createElement('div');
+        healthBar.className = 'health-bar';
+        healthBar.style.cssText = `
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, #4CAF50 0%, #FF9800 50%, #F44336 100%);
+            transition: width 0.3s ease;
+            border-radius: 3px;
+        `;
+        
+        healthBarContainer.appendChild(healthBar);
+        plane.appendChild(healthBarContainer);
+        
+        // Store references
+        plane.healthBar = healthBar;
+        plane.healthBarContainer = healthBarContainer;
     }
     
     // Random vertical position
@@ -1067,13 +1141,30 @@ function catchPlane(plane) {
     if (gameState.mode === 'challenge') {
         plane.tapsCount++;
         
-        // Update tap indicator
-        const indicator = plane.querySelector('.tap-indicator');
-        if (indicator) {
-            indicator.innerHTML = `${plane.tapsRequired - plane.tapsCount}`;
-            if (plane.tapsCount >= plane.tapsRequired) {
-                indicator.style.background = '#4CAF50'; // Green when complete
+        // Set this plane as current target if it's the first tap
+        if (plane.tapsCount === 1 && !gameState.currentTargetPlane) {
+            gameState.currentTargetPlane = plane;
+            updateGlobalHealthBar();
+        }
+        
+        // Update individual plane health bar
+        if (plane.healthBar) {
+            const healthPercent = ((plane.tapsRequired - plane.tapsCount) / plane.tapsRequired) * 100;
+            plane.healthBar.style.width = `${healthPercent}%`;
+            
+            // Change color based on health
+            if (healthPercent > 66) {
+                plane.healthBar.style.background = 'linear-gradient(90deg, #4CAF50 0%, #4CAF50 100%)';
+            } else if (healthPercent > 33) {
+                plane.healthBar.style.background = 'linear-gradient(90deg, #FF9800 0%, #FF9800 100%)';
+            } else {
+                plane.healthBar.style.background = 'linear-gradient(90deg, #F44336 0%, #F44336 100%)';
             }
+        }
+        
+        // Update global health bar if this is the current target
+        if (gameState.currentTargetPlane === plane) {
+            updateGlobalHealthBar();
         }
         
         // Play plane tap sound (instant)
@@ -1082,6 +1173,18 @@ function catchPlane(plane) {
         // Check if enough taps
         if (plane.tapsCount < plane.tapsRequired) {
             return; // Need more taps
+        }
+        
+        // Hide individual health bar when plane is caught
+        if (plane.healthBarContainer) {
+            plane.healthBarContainer.style.opacity = '0';
+            plane.healthBarContainer.style.transition = 'opacity 0.5s ease';
+        }
+        
+        // Clear current target if this plane is caught
+        if (gameState.currentTargetPlane === plane) {
+            gameState.currentTargetPlane = null;
+            hideGlobalHealthBar();
         }
     } else {
         // Standard and Speed modes: single tap
@@ -1177,6 +1280,40 @@ function loseLife() {
     // Check lose condition
     if (gameState.lives <= 0) {
         gameLose();
+    }
+}
+
+// Update global health bar for challenge mode
+function updateGlobalHealthBar() {
+    if (gameState.mode !== 'challenge' || !gameState.currentTargetPlane || !gameState.globalHealthBar) {
+        return;
+    }
+    
+    const plane = gameState.currentTargetPlane;
+    const healthPercent = ((plane.tapsRequired - plane.tapsCount) / plane.tapsRequired) * 100;
+    
+    // Update health bar width
+    gameState.globalHealthBar.style.width = `${healthPercent}%`;
+    
+    // Change color based on health
+    if (healthPercent > 66) {
+        gameState.globalHealthBar.style.background = 'linear-gradient(90deg, #4CAF50 0%, #4CAF50 100%)';
+    } else if (healthPercent > 33) {
+        gameState.globalHealthBar.style.background = 'linear-gradient(90deg, #FF9800 0%, #FF9800 100%)';
+    } else {
+        gameState.globalHealthBar.style.background = 'linear-gradient(90deg, #F44336 0%, #F44336 100%)';
+    }
+    
+    // Show the global health bar
+    if (gameState.globalHealthContainer) {
+        gameState.globalHealthContainer.style.opacity = '1';
+    }
+}
+
+// Hide global health bar
+function hideGlobalHealthBar() {
+    if (gameState.globalHealthContainer) {
+        gameState.globalHealthContainer.style.opacity = '0';
     }
 }
 
@@ -1614,6 +1751,7 @@ function returnToLoadingScreen() {
     if (loadingSound) {
         loadingSound.loop = true;
         SoundManager.play(loadingSound);
+        loadingSoundPlaying = true;
     }
     
     // Re-attach event listeners
@@ -1625,6 +1763,7 @@ function returnToLoadingScreen() {
         
         // Stop loading screen music first
         SoundManager.stop(loadingSound);
+        loadingSoundPlaying = false;
         
         // Play game start sound
         SoundManager.play(gameStartSound);
