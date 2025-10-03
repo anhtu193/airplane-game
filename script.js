@@ -4,6 +4,106 @@ const startOverlay = document.getElementById('startOverlay');
 const loadingVideo = document.getElementById('loadingVideo');
 const gameVideo = document.getElementById('gameVideo');
 
+// Audio elements
+const loadingSound = document.getElementById('loadingSound');
+const gameStartSound = document.getElementById('gameStartSound');
+const planeTapSound = document.getElementById('planeTapSound');
+const buttonClickSound = document.getElementById('buttonClickSound');
+const bonusSound = document.getElementById('bonusSound');
+const gameWinSound = document.getElementById('gameWinSound');
+const gameOverSound = document.getElementById('gameOverSound');
+const gameplayMusic = document.getElementById('gameplayMusic');
+
+// Single tap sound (simplified approach)
+let tapSoundLastPlayTime = 0;
+
+// Sound Manager
+const SoundManager = {
+    enabled: true,
+    volume: 0.7,
+    
+    play(audioElement) {
+        if (!this.enabled || !audioElement) return;
+        
+        // Fast play for instant feedback sounds like tap
+        audioElement.currentTime = 0;
+        audioElement.volume = this.volume;
+        
+        // Force immediate play for quick sounds
+        if (audioElement === planeTapSound || audioElement === bonusSound || audioElement === gameOverSound) {
+            audioElement.play().catch(err => {
+                console.log('Audio play failed:', err);
+            });
+        } else {
+            // Normal play for music
+            audioElement.play().catch(err => {
+                console.log('Audio play failed:', err);
+            });
+        }
+    },
+    
+    stop(audioElement) {
+        if (audioElement) {
+            audioElement.pause();
+            audioElement.currentTime = 0;
+        }
+    },
+    
+    toggle() {
+        this.enabled = !this.enabled;
+        if (!this.enabled) {
+            this.stopAll();
+        }
+    },
+    
+    playTapSound() {
+        if (!this.enabled || !planeTapSound) return;
+        
+        // Prevent rapid overlapping plays
+        const now = Date.now();
+        if (now - tapSoundLastPlayTime < 50) return; // Min 50ms between plays
+        
+        // Quick reset and play
+        planeTapSound.currentTime = 0;
+        planeTapSound.volume = this.volume;
+        
+        const playPromise = planeTapSound.play();
+        if (playPromise !== undefined) {
+            playPromise.catch(err => {
+                console.log('Tap sound failed:', err);
+            });
+        }
+        
+        tapSoundLastPlayTime = now;
+    },
+    
+    playButtonClick() {
+        if (!this.enabled || !buttonClickSound) return;
+        
+        // Instant button click sound
+        buttonClickSound.currentTime = 0;
+        buttonClickSound.volume = this.volume;
+        
+        const playPromise = buttonClickSound.play();
+        if (playPromise !== undefined) {
+            playPromise.catch(err => {
+                console.log('Button click sound failed:', err);
+            });
+        }
+    },
+    
+    stopAll() {
+        this.stop(loadingSound);
+        this.stop(gameStartSound);
+        this.stop(planeTapSound);
+        this.stop(buttonClickSound);
+        this.stop(bonusSound);
+        this.stop(gameWinSound);
+        this.stop(gameOverSound);
+        this.stop(gameplayMusic);
+    }
+};
+
 // Mobile detection
 const isMobile = () => {
     return window.innerWidth <= 768;
@@ -93,6 +193,113 @@ window.addEventListener('DOMContentLoaded', () => {
         // If autoplay is blocked, we can try to play on first user interaction
     });
     
+    // Add user interaction listener to play audio
+    const enableAudio = () => {
+        console.log('User interaction detected, enabling audio...');
+        
+        // Always enable audio on user interaction
+        SoundManager.enabled = true;
+        
+        // Only play loading sound if we're still on loading screen
+        if (loadingSound && !startOverlay.classList.contains('hidden')) {
+            loadingSound.loop = true;
+            SoundManager.play(loadingSound);
+            console.log('Loading sound played after user interaction');
+        }
+        
+        console.log('Audio system enabled');
+    };
+    
+    // Listen for user interaction (not once, so it works after F5)
+    document.addEventListener('click', enableAudio);
+    document.addEventListener('touchstart', enableAudio);
+    document.addEventListener('keydown', enableAudio);
+    
+    // Preload all sounds for instant playback
+    const preloadSounds = [
+        planeTapSound, buttonClickSound, gameStartSound, gameWinSound, gameOverSound
+    ];
+    
+    preloadSounds.forEach(sound => {
+        if (sound) {
+            sound.load();
+            // Set volume to 0 first to avoid playing
+            sound.volume = 0;
+            sound.play().catch(() => {
+                // Ignore autoplay prevention error
+            });
+            sound.pause();
+            sound.currentTime = 0;
+            sound.volume = SoundManager.volume; // Reset volume
+        }
+    });
+    
+    // Play loading screen music with better error handling
+    console.log('=== AUDIO DEBUG INFO ===');
+    console.log('LoadingSound element:', loadingSound);
+    console.log('LoadingSound readyState:', loadingSound ? loadingSound.readyState : 'N/A');
+    console.log('SoundManager enabled:', SoundManager.enabled);
+    console.log('SoundManager volume:', SoundManager.volume);
+    
+    // Check all audio elements
+    const audioElements = [
+        { name: 'loadingSound', element: loadingSound },
+        { name: 'gameStartSound', element: gameStartSound },
+        { name: 'planeTapSound', element: planeTapSound },
+        { name: 'buttonClickSound', element: buttonClickSound },
+        { name: 'gameWinSound', element: gameWinSound },
+        { name: 'gameOverSound', element: gameOverSound },
+        { name: 'gameplayMusic', element: gameplayMusic }
+    ];
+    
+    audioElements.forEach(({ name, element }) => {
+        console.log(`${name}:`, element ? `Found (readyState: ${element.readyState})` : 'NOT FOUND');
+    });
+    console.log('========================');
+    
+    // Force load and play loading sound immediately
+    if (loadingSound) {
+        loadingSound.load();
+        console.log('Loading sound force loaded, readyState:', loadingSound.readyState);
+        
+        // Ensure loop is enabled
+        loadingSound.loop = true;
+        console.log('Loading sound loop enabled:', loadingSound.loop);
+        
+        // Try to play immediately
+        try {
+            SoundManager.play(loadingSound);
+            console.log('Loading sound play attempted immediately');
+        } catch (error) {
+            console.log('Immediate play failed:', error);
+        }
+        
+        // Wait for audio to be ready, then play
+        if (loadingSound.readyState >= 3) { // HAVE_FUTURE_DATA or higher
+            SoundManager.play(loadingSound);
+            console.log('Loading sound played immediately (ready)');
+        } else {
+            // Wait for audio to be ready
+            loadingSound.addEventListener('canplaythrough', () => {
+                console.log('Audio can play through, readyState:', loadingSound.readyState);
+                SoundManager.play(loadingSound);
+                console.log('Loading sound played after load');
+            }, { once: true });
+            
+            // Fallback timeout
+            setTimeout(() => {
+                if (loadingSound.readyState > 0) {
+                    SoundManager.play(loadingSound);
+                    console.log('Loading sound played after timeout');
+                } else {
+                    console.log('Loading sound still not ready, will wait for user interaction');
+                }
+            }, 1000);
+        }
+    } else {
+        console.error('Loading sound element not found!');
+    }
+    
     // Debug mobile elements
     debugMobileElements();
     
@@ -102,11 +309,29 @@ window.addEventListener('DOMContentLoaded', () => {
             console.log('Delayed mobile debug...');
             debugMobileElements();
         }
+        
+        // Retry loading sound after delay if not playing and still on loading screen
+        console.log('Checking loading sound after delay...');
+        console.log('SoundManager enabled:', SoundManager.enabled);
+        if (loadingSound && SoundManager.enabled && !startOverlay.classList.contains('hidden')) {
+            console.log('Retrying loading sound playback...');
+            SoundManager.play(loadingSound);
+        }
+        
     }, 1000);
 });
 
 // Handle start button click
 startButton.addEventListener('click', () => {
+    // Enable audio system
+    SoundManager.enabled = true;
+    
+    // Stop loading screen music first
+    SoundManager.stop(loadingSound);
+    
+    // Play game start sound
+    SoundManager.play(gameStartSound);
+    
     // Hide the start button overlay
     startOverlay.classList.add('hidden');
     
@@ -149,7 +374,7 @@ function showSurveyNotification() {
     notification.innerHTML = `
         <div class="notification-content">
             <p>Trước khi bắt đầu chơi, xin phép bạn trả lời 1 số câu hỏi sau đây nhé</p>
-            <button class="notification-btn" onclick="startSurvey()">Bắt đầu khảo sát</button>
+            <button class="notification-btn" onclick="playButtonSoundAndExecute(startSurvey)">Bắt đầu khảo sát</button>
         </div>
     `;
     
@@ -165,6 +390,12 @@ function showSurveyNotification() {
     setTimeout(() => {
         notification.classList.add('slide-in');
     }, 100);
+}
+
+// Button click wrapper with sound
+function playButtonSoundAndExecute(callback) {
+    SoundManager.playButtonClick();
+    callback();
 }
 
 // Start survey
@@ -202,7 +433,7 @@ function showQuestion(index) {
             <p class="question-text">${question.question}</p>
             <div class="answers-container">
                 ${question.answers.map((answer, i) => `
-                    <button class="answer-btn" onclick="selectAnswer(${index}, ${i}, '${answer}')">
+                    <button class="answer-btn" onclick="playButtonSoundAndExecute(() => selectAnswer(${index}, ${i}, '${answer}'))">
                         ${answer}
                     </button>
                 `).join('')}
@@ -270,6 +501,10 @@ function showGameIntroduction() {
         loadingVideo.classList.remove('active');
     }, 300);
     
+    // Stop any existing music and play gameplay background music
+    SoundManager.stopAll();
+    SoundManager.play(gameplayMusic);
+    
     // Create game introduction overlay after screen transition
     setTimeout(() => {
         const introOverlay = document.createElement('div');
@@ -289,7 +524,7 @@ function showGameIntroduction() {
                     <p style="margin-bottom: 12px; font-size: 14px;">🏆 <strong>Phần thưởng:</strong></p>
                     <p style="margin-bottom: 8px; padding-left: 15px; font-size: 13px;">• Nhận một phần quà bí mật từ Vietjet!</p>
                 </div>
-                <button class="start-game-btn" onclick="startGame()">🚀  Bắt đầu chơi</button>
+                <button class="start-game-btn" onclick="playButtonSoundAndExecute(startGame)">🚀  Bắt đầu chơi</button>
             </div>
         `;
         
@@ -613,6 +848,9 @@ function catchPlane(plane) {
     plane.style.transition = 'opacity 0.5s ease';
     plane.style.opacity = '0';
     
+    // Play plane tap sound (instant)
+    SoundManager.playTapSound();
+    
     // Add to collected planes
     gameState.score++;
     gameState.collectedPlanes.push(plane);
@@ -690,6 +928,11 @@ function loseLife() {
 // Game win
 function gameWin() {
     gameState.gameActive = false;
+    
+    // Play game win sound and stop gameplay music
+    SoundManager.stop(gameplayMusic);
+    SoundManager.play(gameWinSound);
+    
     console.log('You won!');
     showWinScreen();
 }
@@ -697,6 +940,11 @@ function gameWin() {
 // Game lose
 function gameLose() {
     gameState.gameActive = false;
+    
+    // Play game over sound and stop gameplay music
+    SoundManager.stop(gameplayMusic);
+    SoundManager.play(gameOverSound);
+    
     console.log('You lost!');
     showLoseScreen();
 }
@@ -750,7 +998,7 @@ function showWinScreen() {
         <p style="font-family: 'Fernando', sans-serif; font-size: 14px; margin: 15px 0;">
             Quét mã QR để nhận voucher
         </p>
-        <button onclick="showRatingScreen()" style="
+        <button onclick="playButtonSoundAndExecute(showRatingScreen)" style="
             font-family: 'Fernando', sans-serif;
             font-size: 16px;
             padding: 12px 25px;
@@ -802,7 +1050,7 @@ function showLoseScreen() {
         <p style="font-family: 'Fernando', sans-serif; font-size: 16px; margin-bottom: 25px; line-height: 1.4;">
             Không sao, Vietjet vẫn luôn đồng hành cùng bạn trong mọi hành trình!
         </p>
-        <button onclick="showRatingScreen()" style="
+        <button onclick="playButtonSoundAndExecute(showRatingScreen)" style="
             font-family: 'Fernando', sans-serif;
             font-size: 16px;
             padding: 12px 25px;
@@ -898,7 +1146,7 @@ function showRatingScreen() {
         <p id="rating-text" style="font-family: 'Fernando', sans-serif; font-size: 14px; margin: 15px 0; opacity: 0; line-height: 1.3;">
             Chọn số sao để đánh giá
         </p>
-        <button id="submit-rating" onclick="submitRating()" style="
+        <button id="submit-rating" onclick="playButtonSoundAndExecute(submitRating)" style="
             font-family: 'Fernando', sans-serif;
             font-size: 16px;
             padding: 12px 25px;
@@ -1072,9 +1320,25 @@ function returnToLoadingScreen() {
     // Start the loading video
     newLoadingVideo.play();
     
+    // Play loading screen music again with loop
+    SoundManager.stopAll();
+    if (loadingSound) {
+        loadingSound.loop = true;
+        SoundManager.play(loadingSound);
+    }
+    
     // Re-attach event listeners
     newStartButton.addEventListener('click', () => {
         console.log('Start button clicked after reset');
+        
+        // Enable audio system
+        SoundManager.enabled = true;
+        
+        // Stop loading screen music first
+        SoundManager.stop(loadingSound);
+        
+        // Play game start sound
+        SoundManager.play(gameStartSound);
         
         // Hide the start button overlay
         newStartOverlay.classList.add('hidden');
