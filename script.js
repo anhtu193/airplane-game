@@ -1648,27 +1648,27 @@ function submitRating() {
     finalContent.style.cssText = `
         text-align: center;
         color: #ffffff;
-        max-width: 500px;
+        max-width: 600px;
         padding: 20px;
         max-height: 90vh;
         overflow-y: auto;
     `;
     
     finalContent.innerHTML = `
-        <div style="margin-bottom: 15px; text-align: center;">
+        <div style="margin-bottom: clamp(15px, 2vh, 25px); text-align: center;">
             <img src="assets/images/contryside.png" alt="Countryside" style="
-                width: 400px;
+                width: clamp(300px, 25vw, 500px);
                 height: auto;
-                border-radius: 8px;
-                border: 2px solid #ffffff;
-                box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+                border-radius: clamp(6px, 0.5vw, 12px);
+                border: clamp(2px, 0.2vw, 4px) solid #ffffff;
+                box-shadow: 0 clamp(2px, 0.2vw, 4px) clamp(8px, 1vw, 16px) rgba(0,0,0,0.2);
                 opacity: 0.9;
             ">
         </div>
-        <h2 style="font-family: 'Fernando', sans-serif; font-size: 20px; margin-bottom: 20px; color: #00bfff; line-height: 1.3;">
+        <h2 style="font-family: 'Fernando', sans-serif; font-size: clamp(16px, 2.5vw, 24px); margin-bottom: clamp(15px, 2vh, 25px); color: #00bfff; line-height: 1.3;">
             Xin cảm ơn bạn đã sử dụng dịch vụ của Vietjet ngày hôm nay.
         </h2>
-        <p style="font-family: 'Fernando', sans-serif; font-size: 18px; margin-bottom: 25px; line-height: 1.4;">
+        <p style="font-family: 'Fernando', sans-serif; font-size: clamp(14px, 2vw, 20px); margin-bottom: clamp(20px, 2.5vh, 30px); line-height: 1.4;">
             Chúc bạn có 1 chuyến đi vui vẻ và an toàn nhé.
         </p>
         <div style="margin-top: 25px;">
