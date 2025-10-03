@@ -9,6 +9,11 @@
     margin: 0;
     padding: 0;
     box-sizing: border-box;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
 }
 
 body {
@@ -20,6 +25,14 @@ body {
     justify-content: center;
     align-items: center;
     min-height: 100vh;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    -webkit-user-drag: none;
+    -khtml-user-drag: none;
+    -moz-user-drag: none;
+    -o-user-drag: none;
 }
 
 .game-container {
@@ -55,8 +68,8 @@ body {
 /* 16:9 Game Screen with Border */
 .game-screen {
     position: relative;
-    width: 70%;
-    max-width: 1100px;
+    width: auto;
+    height: 90vh;
     aspect-ratio: 16 / 9;
     background:  #fff;
     border: 8px solid #ffffff;
@@ -66,6 +79,12 @@ body {
         0 0 0 8px #fff,
         0 20px 60px rgba(0, 0, 0, 0.8);
     overflow: hidden;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    -webkit-user-drag: none;
+    -moz-user-drag: none;
 }
 
 .game-video {
@@ -80,6 +99,12 @@ body {
     opacity: 0;
     transition: opacity 0.5s ease;
     pointer-events: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    -webkit-user-drag: none;
+    -moz-user-drag: none;
 }
 
 .game-video.active {
@@ -116,8 +141,9 @@ body {
     image-rendering: pixelated;
     max-width: 80%;
     object-fit: contain;
-    margin-bottom: -30px;
-    margin-top: 10px;
+    margin-bottom: clamp(-30px, -3vh, -20px);
+    margin-top: clamp(10px, 1vh, 15px);
+    transform: scale(clamp(0.8, 0.9, 1));
 }
 
 .start-button {
@@ -145,11 +171,13 @@ body {
         2px 2px 0px #0066cc,
         4px 4px 0px #004499,
         6px 6px 0px #003366;
+    transform: scale(clamp(0.8, 0.9, 1));
+    margin-top: clamp(10px, 1vh, 15px);
 }
 
 .start-button:hover {
     background: transparent;
-    transform: translateY(-2px);
+    transform: scale(clamp(0.8, 0.9, 1)) translateY(-2px);
     color: #1ad4ff;
     text-shadow: 
         2px 2px 0px #0088dd,
@@ -159,7 +187,7 @@ body {
 }
 
 .start-button:active {
-    transform: translateY(2px);
+    transform: scale(clamp(0.8, 0.9, 1)) translateY(2px);
     color: #00bfff;
     text-shadow: 
         1px 1px 0px #0066cc,

@@ -1364,7 +1364,7 @@ function showWinScreen() {
         left: 0;
         width: 100%;
         height: 100%;
-        background: rgba(0, 0, 0, 0.9);
+        background: rgba(0, 0, 0, 0.95);
         display: flex;
         justify-content: center;
         align-items: center;
@@ -1436,7 +1436,7 @@ function showLoseScreen() {
         left: 0;
         width: 100%;
         height: 100%;
-        background: rgba(0, 0, 0, 0.9);
+        background: rgba(0, 0, 0, 0.95);
         display: flex;
         justify-content: center;
         align-items: center;
@@ -1501,7 +1501,7 @@ function showRatingScreen() {
         left: 0;
         width: 100%;
         height: 100%;
-        background: rgba(0, 0, 0, 0.9);
+        background: rgba(0, 0, 0, 0.95);
         display: flex;
         justify-content: center;
         align-items: center;
@@ -1519,16 +1519,6 @@ function showRatingScreen() {
     `;
     
     ratingContent.innerHTML = `
-        <div style="margin-bottom: 15px; text-align: center;">
-            <img src="assets/images/contryside.png" alt="Countryside" style="
-                width: 250px;
-                height: auto;
-                border-radius: 8px;
-                border: 2px solid #ffffff;
-                box-shadow: 0 2px 8px rgba(0,0,0,0.2);
-                opacity: 0.9;
-            ">
-        </div>
         <h2 style="font-family: 'Fernando', sans-serif; font-size: 20px; margin-bottom: 20px; line-height: 1.6;">
             Bạn có hài lòng với dịch vụ hôm nay không?
         </h2>
@@ -1647,7 +1637,7 @@ function submitRating() {
         left: 0;
         width: 100%;
         height: 100%;
-        background: rgba(0, 0, 0, 0.7);
+        background: rgba(0, 0, 0, 0.95);
         display: flex;
         justify-content: center;
         align-items: center;
@@ -1665,6 +1655,16 @@ function submitRating() {
     `;
     
     finalContent.innerHTML = `
+        <div style="margin-bottom: 15px; text-align: center;">
+            <img src="assets/images/contryside.png" alt="Countryside" style="
+                width: 400px;
+                height: auto;
+                border-radius: 8px;
+                border: 2px solid #ffffff;
+                box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+                opacity: 0.9;
+            ">
+        </div>
         <h2 style="font-family: 'Fernando', sans-serif; font-size: 20px; margin-bottom: 20px; color: #00bfff; line-height: 1.3;">
             Xin cảm ơn bạn đã sử dụng dịch vụ của Vietjet ngày hôm nay.
         </h2>
@@ -1672,7 +1672,7 @@ function submitRating() {
             Chúc bạn có 1 chuyến đi vui vẻ và an toàn nhé.
         </p>
         <div style="margin-top: 25px;">
-            <!-- <img src="assets/images/mew.gif" alt="Mew" style="width: 80px; height: auto; image-rendering: pixelated;"> -->
+            <!-- <img src="assets/images/mew.gif" alt="Mew" rstyle="width: 80px; height: auto; image-rendering: pixelated;"> -->
             <!-- <img src="assets/images/sylveon.gif" alt="Sylveon" style="width: 80px; height: auto; image-rendering: pixelated; margin-left: 15px;"> -->
         </div>
     `;
